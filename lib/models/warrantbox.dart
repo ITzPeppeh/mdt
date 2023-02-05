@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mdt/utils/constants.dart';
+import 'package:mdt/models/constants.dart';
 
 class WarrantBox extends StatelessWidget {
   final String civName;

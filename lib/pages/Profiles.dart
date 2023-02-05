@@ -1,9 +1,7 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
-import 'package:mdt/utils/constants.dart';
-import 'package:mdt/utils/profile.dart';
-import 'package:mdt/utils/sidebar.dart';
+import 'package:mdt/models/constants.dart';
+import 'package:mdt/models/profile.dart';
+import 'package:mdt/models/sidebar.dart';
 
 class Profiles extends StatelessWidget {
   const Profiles({super.key});
@@ -83,22 +81,28 @@ class Profiles extends StatelessWidget {
                           fit: BoxFit.cover,
                         ))),
                     Column(
-                      children: [Text('State ID'), Text('Name'), Text('Profile Image URL')], //FIXME: ADD TEXTFIELDS 
+                      children: [
+                        Text('State ID'),
+                        Text('Name'),
+                        Text('Profile Image URL')
+                      ], //FIXME: ADD TEXTFIELDS
                     )
                   ],
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: sideBarColor,
-                        hintText: 'Document content goes here...',
-                        hintStyle: TextStyle(color: secondaryTextColor)),
-                    style: TextStyle(color: textColor),
-                    keyboardType: TextInputType.multiline,
-                    minLines: 25,
-                    maxLines: null,
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          filled: true,
+                          fillColor: sideBarColor,
+                          hintText: 'Document content goes here...',
+                          hintStyle: TextStyle(color: secondaryTextColor)),
+                      style: TextStyle(color: textColor),
+                      keyboardType: TextInputType.multiline,
+                      minLines: 25,
+                      maxLines: null,
+                    ),
                   ),
                 )
               ]),
@@ -106,10 +110,17 @@ class Profiles extends StatelessWidget {
           ),
           Expanded(
             child: Container(
-              width: 150,
-              color: colorBox,
-              margin: const EdgeInsets.all(6),
-              child: Column(children: [
+                width: 150,
+                //color: colorBox,
+                margin: const EdgeInsets.all(6),
+                child: Column(
+                  children: [
+                    TabProfile(title: 'Licenses'),
+                    /* Da passare l'ID */
+                    TabProfile(title: 'Priors'),
+                  ],
+                )
+                /*Column(children: [
                 Row(
                   children: const [
                     Padding(
@@ -132,8 +143,8 @@ class Profiles extends StatelessWidget {
                     maxLines: null,
                   ),
                 )
-              ]),
-            ),
+              ]),*/
+                ),
           )
         ],
       ),

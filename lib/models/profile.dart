@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:mdt/utils/constants.dart';
+import 'package:mdt/models/constants.dart';
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+class TabProfile extends StatelessWidget {
+  final title;
+  const TabProfile({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Row(
+      children: [
+        Expanded(
+            child: Container(
+          margin: const EdgeInsets.only(bottom: 5),
+          height: 100,
+          color: colorBox,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 15),
+            ),
+          ),
+        ))
+      ],
+    );
   }
 }
 

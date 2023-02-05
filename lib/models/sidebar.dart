@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sidebarx/sidebarx.dart';
-import 'package:mdt/utils/constants.dart';
+import 'package:mdt/models/constants.dart';
 
 SidebarX mySidebar(BuildContext context, {int selectIdx = 0}) {
   return SidebarX(
@@ -30,8 +30,14 @@ SidebarX mySidebar(BuildContext context, {int selectIdx = 0}) {
       SidebarXItem(icon: Icons.home, label: 'Dashboard', onTap: () {
         Navigator.pushNamed(context, '/');
       },),
-      SidebarXItem(icon: Icons.search, label: 'Profiles', onTap: () {
+      SidebarXItem(icon: Icons.supervised_user_circle, label: 'Profiles', onTap: () {
         Navigator.pushNamed(context, '/profiles');
+      },),
+      SidebarXItem(icon: Icons.edit_note, label: 'Reports', onTap: () {
+        Navigator.pushNamed(context, '/reports');
+      },),
+      SidebarXItem(icon: Icons.filter_list, label: 'Charges', onTap: () {
+        Navigator.pushNamed(context, '/charges');
       },),
     ],
   );

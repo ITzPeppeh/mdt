@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mdt/utils/constants.dart';
-import 'package:mdt/utils/sidebar.dart';
-import 'package:mdt/utils/warrantbox.dart';
+import 'package:mdt/models/constants.dart';
+import 'package:mdt/models/sidebar.dart';
+import 'package:mdt/models/warrantbox.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

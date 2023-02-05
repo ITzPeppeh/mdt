@@ -1,5 +1,5 @@
 name: mdt
-description: A new Flutter project.
+description: A brand new MDT from Joseph Divine and Davide Gioetto.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -31,8 +31,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_fonts: ^2.1.0
-  cupertino_icons: ^1.0.2
   sidebarx: ^0.14.0
   sqflite: ^2.2.4+1
 
