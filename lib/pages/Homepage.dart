@@ -3,6 +3,7 @@ import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/database.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/warrantbox.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +13,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
+
+  @override
+  void initState() {
+    if (_myDB.get(tableUsersName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,18 +51,17 @@ class _HomePageState extends State<HomePage> {
                 //SEARCH BAR TextField ?
               ],
             ),
-            const WarrantBox(
-              civID: 1,
-              civName: 'Pippo',
-              civImage:
-                  'https://static.vecteezy.com/ti/vettori-gratis/p3/2158565-avatar-profilo-rosa-neon-icona-muro-mattoni-sfondo-rosa-neon-icona-vettore-vettoriale.jpg',
+            ListView.builder(
+              shrinkWrap: true,
+              itemCount: db.getWarrants().length,
+              itemBuilder: (context, index) {
+                List data = db.getWarrants();
+                return WarrantBox(
+                    civID: data[index]['id'],
+                    civName: data[index]['fullName'],
+                    civImage: data[index]['imageURL']);
+              },
             ),
-            const WarrantBox(
-              civID: 2,
-              civName: 'Peppe',
-              civImage:
-                  'https://static.vecteezy.com/ti/vettori-gratis/p3/2158565-avatar-profilo-rosa-neon-icona-muro-mattoni-sfondo-rosa-neon-icona-vettore-vettoriale.jpg',
-            )
           ]),
         )),
         Expanded(

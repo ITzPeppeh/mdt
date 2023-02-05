@@ -43,7 +43,7 @@ class SearchProfile extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          debugPrint('Coap');
+          print("Tapped $civName - $civID");
         },
         child: Row(
           children: [

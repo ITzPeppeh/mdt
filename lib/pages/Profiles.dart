@@ -2,9 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/profile.dart';
 import 'package:mdt/models/sidebar.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mdt/models/database.dart';
 
-class Profiles extends StatelessWidget {
+class Profiles extends StatefulWidget {
   const Profiles({super.key});
+
+  @override
+  State<Profiles> createState() => _ProfilesState();
+}
+
+class _ProfilesState extends State<Profiles> {
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
+
+  @override
+  void initState() {
+    if (_myDB.get(tableUsersName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,17 +46,19 @@ class Profiles extends StatelessWidget {
                         'Profiles',
                         style: TextStyle(fontSize: 20),
                       ),
-                    )
+                    ),
                   ],
                 ),
-                const SearchProfile(
-                  civName: 'John Charleston',
-                  civID: 1,
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: db.listUsers.length,
+                  itemBuilder: (context, index) {
+                    List data = db.listUsers;
+                    return SearchProfile(
+                        civID: data[index].id,
+                        civName: data[index].fullName);
+                  },
                 ),
-                const SearchProfile(
-                  civName: 'Italia Pizza',
-                  civID: 2,
-                )
               ]),
             ),
           ),

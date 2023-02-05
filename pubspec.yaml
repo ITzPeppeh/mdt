@@ -31,8 +31,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  hive_flutter: ^1.1.0
   sidebarx: ^0.14.0
-  sqflite: ^2.2.4+1
+  
 
 dev_dependencies:
   flutter_test:
