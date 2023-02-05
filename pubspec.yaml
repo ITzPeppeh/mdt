@@ -31,8 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  mysql1: ^0.20.0
   sidebarx: ^0.14.0
+  sqflite: ^2.2.4+1
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
+import 'package:mdt/models/constants.dart';
 import 'package:sqflite/sqflite.dart';
 
 class MyDatabase {
@@ -19,7 +21,7 @@ class MyDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
-    return await openDatabase(path, version: 1, onCreate:  _createDB);
+    return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
   Future _createDB(Database db, int version) async {
@@ -42,7 +44,7 @@ CREATE TABLE $tableName (
 
     final id = await db.insert(tableName, newcivile.toJson());
 
-    return newcivile.copy(id:id);
+    return newcivile.copy(id: id);
   }
 
   Future<Civ> getCiv(int id) async {
@@ -72,11 +74,11 @@ CREATE TABLE $tableName (
     final db = await instance.database;
 
     return db.update(
-      tableName, 
+      tableName,
       civile.toJson(),
       where: '${CivFields.id} = ?',
       whereArgs: [civile.id],
-      );
+    );
   }
 
   Future<int> delete(int id) async {
@@ -100,9 +102,7 @@ CREATE TABLE $tableName (
 final String tableName = 'civili';
 
 class CivFields {
-  static final List<String> values = [
-    id, isWarant, number
-  ];
+  static final List<String> values = [id, isWarant, number];
 
   static final String id = '_id';
   static final String isWarant = 'isWarant';
@@ -124,23 +124,22 @@ class Civ {
     int? id,
     bool? isWarant,
     int? number,
-  }) => Civ(
-    id: id ?? this.id,
-    isWarant : isWarant ?? this.isWarant,
-    number : number ?? this.number,
-    );
+  }) =>
+      Civ(
+        id: id ?? this.id,
+        isWarant: isWarant ?? this.isWarant,
+        number: number ?? this.number,
+      );
 
   static Civ fromJson(Map<String, Object?> json) => Civ(
-    id: json[CivFields.id] as int?,
-    isWarant: json[CivFields.isWarant] == 1,
-    number: json[CivFields.number] as int,
-    );
+        id: json[CivFields.id] as int?,
+        isWarant: json[CivFields.isWarant] == 1,
+        number: json[CivFields.number] as int,
+      );
 
-  Map <String, Object?> toJson() => {
-    CivFields.id : id,
-    CivFields.isWarant : isWarant ? 1 : 0,
-    CivFields.number : number,
-  };
-
-
+  Map<String, Object?> toJson() => {
+        CivFields.id: id,
+        CivFields.isWarant: isWarant ? 1 : 0,
+        CivFields.number: number,
+      };
 }

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
+import 'package:mdt/models/database.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/warrantbox.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +74,7 @@ class HomePage extends StatelessWidget {
                 child: TextField(
                   decoration:
                       InputDecoration(filled: true, fillColor: sideBarColor),
-                      style: TextStyle(color: textColor),
+                  style: TextStyle(color: textColor),
                   keyboardType: TextInputType.multiline,
                   minLines: 10,
                   maxLines: null,

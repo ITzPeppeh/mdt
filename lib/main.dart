@@ -20,6 +20,6 @@ void main() => runApp(MaterialApp(
         '/': (context) => const HomePage(),
         '/profiles': (context) => const Profiles(),
         '/reports': (context) => const Reports(),
-        '/charges' :(context) => const Charges(),
+        '/charges': (context) => const Charges(),
       },
     ));
