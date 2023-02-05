@@ -15,6 +15,7 @@ class Profiles extends StatefulWidget {
 class _ProfilesState extends State<Profiles> {
   final _myDB = Hive.box(dbName);
   MyDatabase db = MyDatabase();
+  String titleProfileName = 'Create Profile';
 
   @override
   void initState() {
@@ -53,29 +54,34 @@ class _ProfilesState extends State<Profiles> {
                   ],
                 ),
                 TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Search', suffixIcon: Icon(Icons.search)
-                  )
-                  ,onChanged: (textValue) {
+                  decoration: const InputDecoration(
+                      labelStyle: TextStyle(color: textColor),
+                      labelText: 'Search',
+                      suffixIcon: Icon(Icons.search)),
+                  onChanged: (textValue) {
                     List results = [];
-                  if (textValue.isEmpty) {
-                    results = db.listUsers;
-                  } else {
-                    results = db.listUsers.where((element) => element.fullName.toLowerCase().contains(textValue.toLowerCase())).toList();
-                  }
+                    if (textValue.isEmpty) {
+                      results = db.listUsers;
+                    } else {
+                      results = db.listUsers
+                          .where((element) => element.fullName
+                              .toLowerCase()
+                              .contains(textValue.toLowerCase()))
+                          .toList();
+                    }
 
-                  setState(() {
-                    _foundUsers = results;
-                  });
-                },),
+                    setState(() {
+                      _foundUsers = results;
+                    });
+                  },
+                ),
                 ListView.builder(
                   shrinkWrap: true,
                   itemCount: _foundUsers.length,
                   itemBuilder: (context, index) {
                     List data = _foundUsers;
                     return SearchProfile(
-                        civID: data[index].id,
-                        civName: data[index].fullName);
+                        civID: data[index].id, civName: data[index].fullName);
                   },
                 ),
               ]),
@@ -90,11 +96,11 @@ class _ProfilesState extends State<Profiles> {
               child: Column(children: [
                 Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        'Create Profile',
-                        style: TextStyle(fontSize: 20),
+                        titleProfileName,
+                        style: const TextStyle(fontSize: 20),
                       ),
                     ),
                     const Expanded(child: SizedBox()),
@@ -121,12 +127,45 @@ class _ProfilesState extends State<Profiles> {
                               NetworkImage('https://i.imgur.com/ZSqeINh.png'),
                           fit: BoxFit.cover,
                         ))),
-                    Column(
-                      children: [
-                        Text('State ID'),
-                        Text('Name'),
-                        Text('Profile Image URL')
-                      ], //FIXME: ADD TEXTFIELDS
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: const [
+                              SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                        labelStyle: TextStyle(color: textColor),
+                                        labelText: 'State ID'),
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: const [
+                              SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                        labelStyle: TextStyle(color: textColor),
+                                        labelText: 'Full Name'),
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: const [
+                              SizedBox(
+                                  width: 200,
+                                  child: TextField(
+                                    decoration: InputDecoration(
+                                        labelStyle: TextStyle(color: textColor),
+                                        labelText: 'Profile Image URL'),
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -155,37 +194,12 @@ class _ProfilesState extends State<Profiles> {
                 //color: colorBox,
                 margin: const EdgeInsets.all(6),
                 child: Column(
-                  children: [
+                  children: const [
                     TabProfile(title: 'Licenses'),
                     /* Da passare l'ID */
                     TabProfile(title: 'Priors'),
                   ],
-                )
-                /*Column(children: [
-                Row(
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Profiles',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    )
-                  ],
-                ),
-                 const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                    decoration:
-                        InputDecoration(filled: true, fillColor: sideBarColor),
-                    style: TextStyle(color: textColor),
-                    keyboardType: TextInputType.multiline,
-                    minLines: 15,
-                    maxLines: null,
-                  ),
-                )
-              ]),*/
-                ),
+                )),
           )
         ],
       ),
