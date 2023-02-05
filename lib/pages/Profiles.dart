@@ -23,8 +23,11 @@ class _ProfilesState extends State<Profiles> {
     } else {
       db.loadData();
     }
+    _foundUsers = db.listUsers;
     super.initState();
   }
+
+  List _foundUsers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +52,27 @@ class _ProfilesState extends State<Profiles> {
                     ),
                   ],
                 ),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Search', suffixIcon: Icon(Icons.search)
+                  )
+                  ,onChanged: (textValue) {
+                    List results = [];
+                  if (textValue.isEmpty) {
+                    results = db.listUsers;
+                  } else {
+                    results = db.listUsers.where((element) => element.fullName.toLowerCase().contains(textValue.toLowerCase())).toList();
+                  }
+
+                  setState(() {
+                    _foundUsers = results;
+                  });
+                },),
                 ListView.builder(
                   shrinkWrap: true,
-                  itemCount: db.listUsers.length,
+                  itemCount: _foundUsers.length,
                   itemBuilder: (context, index) {
-                    List data = db.listUsers;
+                    List data = _foundUsers;
                     return SearchProfile(
                         civID: data[index].id,
                         civName: data[index].fullName);
