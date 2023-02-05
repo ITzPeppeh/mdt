@@ -15,7 +15,7 @@ void main() => runApp(MaterialApp(
           scaffoldBackgroundColor: colorBackground // default bgrd color
           ),
       routes: {
-        '/': (context) => const HomePage(),
+        '/': (context) => const  HomePage(),
         '/profiles': (context) =>
             const Profiles(), /*
         '/SignUp': (context) => SignUp(),
