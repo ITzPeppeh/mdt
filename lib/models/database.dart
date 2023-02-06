@@ -29,7 +29,7 @@ class MyDatabase {
   void deleteUserFromId(int ID) {
     int a = listUsers.indexWhere((element) => element.id == ID);
     if (a != -1) {
-      listUsers.removeAt(a);
+      listUsers = List.from(listUsers)..removeAt(a);
     }
   }
 
@@ -39,7 +39,7 @@ class MyDatabase {
       listUsers.add(newuser); //Increment ID
     } else {
       listUsers[ind] = Civ(
-          id: newuser.id,
+          id: listUsers[ind].id,
           fullName: newuser.fullName,
           isWarant: listUsers[ind].isWarant,
           imageProfileURL: newuser.imageProfileURL,
@@ -48,7 +48,7 @@ class MyDatabase {
   }
 
   void createInitialData() {
-    listUsers = const [
+    listUsers = [
       Civ(
           detailsProfile: 'suca',
           id: 1,
@@ -145,6 +145,7 @@ class Charge{
   final String chargeName;
   const Charge({required this.chargeName});
 }
+
 List<Charge> listCharges = [
   Charge(chargeName: 'Criminal Possession of a Firearm'),
   Charge(chargeName: 'Criminal Sale of an illegal weapon'),

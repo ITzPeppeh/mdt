@@ -128,15 +128,13 @@ class _ProfilesState extends State<Profiles> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          db.deleteUserFromId(2);
-                          db.updateDatabase();
+                          db.deleteUserFromId(int.parse(
+                              _stateIdTextFieldController.text == ''
+                                  ? '-1'
+                                  : _stateIdTextFieldController.text));
+                          _foundUsers = MyDatabase.listUsers;
                           ProfilesTexts.clearAll();
                         });
-                        /*MyDatabase.deleteUserFromId(
-                              int.parse(_stateIdTextFieldController.text));
-                          setState(() {
-                            ProfilesTexts.clearAll();
-                          });*/
                       },
                       icon: const Icon(Icons.delete),
                       color: textColor,
@@ -145,14 +143,21 @@ class _ProfilesState extends State<Profiles> {
                     ),
                     IconButton(
                       onPressed: () {
-                        db.createOrUpdateUser(Civ(
-                            id: int.parse(_stateIdTextFieldController.text),
-                            fullName: _fullNameTextFieldController.text,
-                            isWarant: false,
-                            imageProfileURL: _imageURLTextFieldController.text,
-                            detailsProfile: _detailsTextFieldController.text));
+                        if (_stateIdTextFieldController.text == '') return;
                         setState(() {
-                          print('object2');
+                          db.createOrUpdateUser(Civ(
+                              id: int.parse(
+                                  _stateIdTextFieldController.text == ''
+                                      ? '-1'
+                                      : _stateIdTextFieldController.text),
+                              fullName: _fullNameTextFieldController.text,
+                              isWarant: false,
+                              imageProfileURL:
+                                  _imageURLTextFieldController.text,
+                              detailsProfile:
+                                  _detailsTextFieldController.text));
+                          _foundUsers = MyDatabase.listUsers;
+                          ProfilesTexts.clearAll();
                         });
                       },
                       icon: const Icon(Icons.save),
@@ -185,7 +190,7 @@ class _ProfilesState extends State<Profiles> {
                                   child: TextField(
                                     keyboardType: TextInputType.number,
                                     controller: _stateIdTextFieldController
-                                      ..text = ProfilesTexts.textProfileName,
+                                      ..text = ProfilesTexts.textProfileID,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
                                         labelText: 'State ID'),
@@ -198,7 +203,7 @@ class _ProfilesState extends State<Profiles> {
                                   width: 200,
                                   child: TextField(
                                     controller: _fullNameTextFieldController
-                                      ..text = ProfilesTexts.textProfileID,
+                                      ..text = ProfilesTexts.textProfileName,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
                                         labelText: 'Full Name'),
@@ -246,16 +251,58 @@ class _ProfilesState extends State<Profiles> {
           ),
           Expanded(
             child: Container(
-                width: 150,
-                //color: colorBox,
-                margin: const EdgeInsets.all(6),
-                child: Column(
+              width: 150,
+              color: colorBox,
+              margin: const EdgeInsets.all(6),
+              child: Column(children: [
+                Row(
                   children: const [
-                    TabProfile(title: 'Licenses'),
-                    /* Da passare l'ID */
-                    TabProfile(title: 'Priors'),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Related Reports',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
                   ],
-                )),
+                ),
+                TextField(
+                  decoration: const InputDecoration(
+                      labelStyle: TextStyle(color: textColor),
+                      labelText: 'Search',
+                      suffixIcon: Icon(Icons.search)),
+                  onChanged: (textValue) {
+                    /*
+                    List results = [];
+                    if (textValue.isEmpty) {
+                      results = MyDatabase.listUsers;
+                    } else {
+                      results = MyDatabase.listUsers
+                          .where((element) => element.fullName
+                              .toLowerCase()
+                              .contains(textValue.toLowerCase()))
+                          .toList();
+                    }
+
+                    setState(() {
+                      _foundUsers = results;
+                    });*/
+                  },
+                ), /*
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _foundUsers.length,
+                  itemBuilder: (context, index) {
+                    List data = _foundUsers;
+                    return SearchProfile(
+                      civID: data[index].id,
+                      civName: data[index].fullName,
+                      notifyParent: refresh,
+                    );
+                  },
+                ),*/
+              ]),
+            ),
           )
         ],
       ),

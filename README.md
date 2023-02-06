@@ -8,6 +8,7 @@ Run this commands in project folder:
 `flutter pub get`
 
 
-#Fix Delete, Save profile and implement licenses
+#implement curretly reports
 #Fix Delete, Save report and implement criminal
 #Fix Scroll ListView Charges
+#User provider replacing listview
