@@ -43,7 +43,6 @@ class _SearchReportState extends State<SearchReport> {
           ReportsTexts.textReportID = report.id.toString();
           ReportsTexts.textDetails = report.detailsReport;
           widget.notifyParent();
-          debugPrint('Coap');
         },
         child: Row(
           children: [

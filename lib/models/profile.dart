@@ -59,7 +59,6 @@ class _SearchProfileState extends State<SearchProfile> {
           ProfilesTexts.textProfileImageURL = user.imageProfileURL;
           ProfilesTexts.detailsProfile = user.detailsProfile;
           widget.notifyParent();
-          print("Tapped ${widget.civName} - ${widget.civID}");
         },
         child: Row(
           children: [

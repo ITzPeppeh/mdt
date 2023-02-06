@@ -9,6 +9,6 @@ Run this commands in project folder:
 
 
 #implement curretly reports
-#Fix Delete, Save report and implement criminal
+#implement criminal
 #Fix Scroll ListView Charges
 #User provider replacing listview

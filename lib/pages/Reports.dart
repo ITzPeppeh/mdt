@@ -113,35 +113,46 @@ class _ReportsState extends State<Reports> {
                   ),
                   const Expanded(child: SizedBox()),
                   IconButton(
-                      onPressed: () {
-                        setState(() {
-                          ReportsTexts.clearAll();
-                        });
-                      },
-                      icon: const Icon(Icons.create_new_folder),
-                      color: textColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          ReportsTexts.clearAll();
-                        });
-                        /*MyDatabase.deleteUserFromId(
-                              int.parse(_stateIdTextFieldController.text));
-                          setState(() {
-                            ProfilesTexts.clearAll();
-                          });*/
-                      },
-                      icon: const Icon(Icons.delete),
-                      color: textColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                    ),
+                    onPressed: () {
+                      setState(() {
+                        ReportsTexts.clearAll();
+                      });
+                    },
+                    icon: const Icon(Icons.create_new_folder),
+                    color: textColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
                   IconButton(
                     onPressed: () {
-                      debugPrint('salvo');
+                      setState(() {
+                        db.deleteReportFromId(int.parse(
+                            ReportsTexts.textReportID == ''
+                                ? '-1'
+                                : ReportsTexts.textReportID));
+                        _foundReports = MyDatabase.listReports;
+                        ReportsTexts.clearAll();
+                      });
+                    },
+                    icon: const Icon(Icons.delete),
+                    color: textColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      if (ReportsTexts.textReportTitle == '') return;
+                      setState(() {
+                        db.createOrUpdateReport(Report(
+                            id: int.parse(ReportsTexts.textReportID == ''
+                                ? '-1'
+                                : ReportsTexts.textReportID),
+                            reportName: ReportsTexts.textReportTitle,
+                            dateCreated: DateTime.now(),
+                            detailsReport: ReportsTexts.textDetails));
+                        _foundReports = MyDatabase.listReports;
+                        ReportsTexts.clearAll();
+                      });
                     },
                     icon: const Icon(Icons.save),
                     color: textColor,
@@ -151,6 +162,9 @@ class _ReportsState extends State<Reports> {
                 ],
               ),
               TextField(
+                onChanged: (value) {
+                  ReportsTexts.textReportTitle = value;
+                },
                 controller: _titleReportTextFieldController
                   ..text = ReportsTexts.textReportTitle,
                 style: const TextStyle(color: textColor),
@@ -167,6 +181,9 @@ class _ReportsState extends State<Reports> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
+                    onChanged: (value) {
+                      ReportsTexts.textDetails = value;
+                    },
                     controller: _detailsReportTextFieldController
                       ..text = ReportsTexts.textDetails,
                     decoration: const InputDecoration(

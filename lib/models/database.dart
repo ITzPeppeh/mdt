@@ -33,6 +33,13 @@ class MyDatabase {
     }
   }
 
+  void deleteReportFromId(int ID) {
+    int a = listReports.indexWhere((element) => element.id == ID);
+    if (a != -1) {
+      listReports = List.from(listReports)..removeAt(a);
+    }
+  }
+
   void createOrUpdateUser(Civ newuser) {
     int ind = listUsers.indexWhere((element) => element.id == newuser.id);
     if (ind == -1) {
@@ -44,6 +51,22 @@ class MyDatabase {
           isWarant: listUsers[ind].isWarant,
           imageProfileURL: newuser.imageProfileURL,
           detailsProfile: newuser.detailsProfile);
+    }
+  }
+
+
+
+  void createOrUpdateReport(Report newreport) {
+    int ind = listReports.indexWhere((element) => element.id == newreport.id);
+    if (ind == -1) {
+      int newid = listReports.last.id + 1;
+      listReports.add(Report(id: newid, reportName: newreport.reportName, dateCreated: newreport.dateCreated, detailsReport: newreport.detailsReport)); //Increment ID
+    } else {
+      listReports[ind] = Report(
+          id: listReports[ind].id,
+          reportName: newreport.reportName,
+          detailsReport: newreport.detailsReport,
+          dateCreated: listReports[ind].dateCreated);
     }
   }
 
