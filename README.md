@@ -8,3 +8,5 @@ Run this commands in project folder:
 `flutter pub get`
 
 
+#Fix Delete, Save profile and implement licenses
+#Fix Delete, Save report and implement criminal

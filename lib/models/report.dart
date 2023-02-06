@@ -1,15 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
+import 'package:mdt/models/database.dart';
 
-class SearchReport extends StatelessWidget {
+class SearchReport extends StatefulWidget {
   final title;
   final id;
   final dateCreate;
-  const SearchReport(
-      {super.key,
-      required this.title,
-      required this.id,
-      required this.dateCreate});
+  final Function() notifyParent;
+
+  const SearchReport({
+    super.key,
+    required this.title,
+    required this.id,
+    required this.dateCreate,
+    required this.notifyParent,
+  });
+
+  @override
+  State<SearchReport> createState() => _SearchReportState();
+}
+
+class _SearchReportState extends State<SearchReport> {
+  String dateToString = '';
+
+  @override
+  void initState() {
+    dateToString =
+        "${widget.dateCreate.day}-${widget.dateCreate.month}-${widget.dateCreate.year}";
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +36,13 @@ class SearchReport extends StatelessWidget {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
+          Report report = MyDatabase.getReportFromID(widget.id);
+          ReportsTexts.titleReportName =
+              'Edit Incident (#${report.id.toString()})';
+          ReportsTexts.textReportTitle = report.reportName;
+          ReportsTexts.textReportID = report.id.toString();
+          ReportsTexts.textDetails = report.detailsReport;
+          widget.notifyParent();
           debugPrint('Coap');
         },
         child: Row(
@@ -29,11 +55,12 @@ class SearchReport extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(5.0),
-                    child: Text(title, style: const TextStyle(fontSize: 13)),
+                    child: Text(widget.title,
+                        style: const TextStyle(fontSize: 13)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(2.0),
-                    child: Text("ID: ${id.toString()} - $dateCreate",
+                    child: Text("ID: ${widget.id.toString()} - $dateToString",
                         style: const TextStyle(fontSize: 13)),
                   )
                 ],

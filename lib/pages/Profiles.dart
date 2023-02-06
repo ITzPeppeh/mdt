@@ -20,6 +20,9 @@ class _ProfilesState extends State<Profiles> {
   }
 
   TextEditingController _stateIdTextFieldController = TextEditingController();
+  TextEditingController _fullNameTextFieldController = TextEditingController();
+  TextEditingController _imageURLTextFieldController = TextEditingController();
+  TextEditingController _detailsTextFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -129,7 +132,7 @@ class _ProfilesState extends State<Profiles> {
                           db.updateDatabase();
                           ProfilesTexts.clearAll();
                         });
-                          /*MyDatabase.deleteUserFromId(
+                        /*MyDatabase.deleteUserFromId(
                               int.parse(_stateIdTextFieldController.text));
                           setState(() {
                             ProfilesTexts.clearAll();
@@ -142,6 +145,12 @@ class _ProfilesState extends State<Profiles> {
                     ),
                     IconButton(
                       onPressed: () {
+                        db.createOrUpdateUser(Civ(
+                            id: int.parse(_stateIdTextFieldController.text),
+                            fullName: _fullNameTextFieldController.text,
+                            isWarant: false,
+                            imageProfileURL: _imageURLTextFieldController.text,
+                            detailsProfile: _detailsTextFieldController.text));
                         setState(() {
                           print('object2');
                         });
@@ -174,6 +183,7 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
+                                    keyboardType: TextInputType.number,
                                     controller: _stateIdTextFieldController
                                       ..text = ProfilesTexts.textProfileName,
                                     decoration: const InputDecoration(
@@ -187,7 +197,7 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: TextEditingController()
+                                    controller: _fullNameTextFieldController
                                       ..text = ProfilesTexts.textProfileID,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -200,7 +210,7 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: TextEditingController()
+                                    controller: _imageURLTextFieldController
                                       ..text = ProfilesTexts.textProfileURL,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -217,7 +227,7 @@ class _ProfilesState extends State<Profiles> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
-                      controller: TextEditingController()
+                      controller: _detailsTextFieldController
                         ..text = ProfilesTexts.detailsProfile,
                       decoration: const InputDecoration(
                           filled: true,

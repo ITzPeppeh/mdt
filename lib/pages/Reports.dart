@@ -2,9 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/report.dart';
 import 'package:mdt/models/sidebar.dart';
+import 'package:mdt/models/database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-class Reports extends StatelessWidget {
+class Reports extends StatefulWidget {
   const Reports({super.key});
+
+  @override
+  State<Reports> createState() => _ReportsState();
+}
+
+class _ReportsState extends State<Reports> {
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
+  refresh() {
+    setState(() {});
+  }
+
+  TextEditingController _titleReportTextFieldController =
+      TextEditingController();
+  TextEditingController _detailsReportTextFieldController =
+      TextEditingController();
+
+  @override
+  void initState() {
+    if (_myDB.get(tableReportsName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
+    _foundReports = MyDatabase.listReports;
+    super.initState();
+  }
+
+  List _foundReports = [];
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +59,41 @@ class Reports extends StatelessWidget {
                   )
                 ],
               ),
-              const SearchReport(
-                title: 'John Charleston',
-                id: 1,
-                dateCreate: '1234',
+              TextField(
+                decoration: const InputDecoration(
+                    labelStyle: TextStyle(color: textColor),
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search)),
+                onChanged: (textValue) {
+                  List results = [];
+                  if (textValue.isEmpty) {
+                    results = MyDatabase.listReports;
+                  } else {
+                    results = MyDatabase.listReports
+                        .where((element) => element.reportName
+                            .toLowerCase()
+                            .contains(textValue.toLowerCase()))
+                        .toList();
+                  }
+
+                  setState(() {
+                    _foundReports = results;
+                  });
+                },
               ),
-              const SearchReport(
-                title: 'Italia Pizza',
-                id: 2,
-                dateCreate: '23132',
-              )
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _foundReports.length,
+                itemBuilder: (context, index) {
+                  List data = _foundReports;
+                  return SearchReport(
+                    title: data[index].reportName,
+                    id: data[index].id,
+                    dateCreate: data[index].dateCreated,
+                    notifyParent: refresh,
+                  );
+                },
+              ),
             ]),
           ),
         ),
@@ -48,14 +104,41 @@ class Reports extends StatelessWidget {
             child: Column(children: [
               Row(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Edit Report (#12345)',
-                      style: TextStyle(fontSize: 20),
+                      ReportsTexts.titleReportName,
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
                   const Expanded(child: SizedBox()),
+                  IconButton(
+                      onPressed: () {
+                        setState(() {
+                          ReportsTexts.clearAll();
+                        });
+                      },
+                      icon: const Icon(Icons.create_new_folder),
+                      color: textColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          ReportsTexts.clearAll();
+                        });
+                        /*MyDatabase.deleteUserFromId(
+                              int.parse(_stateIdTextFieldController.text));
+                          setState(() {
+                            ProfilesTexts.clearAll();
+                          });*/
+                      },
+                      icon: const Icon(Icons.delete),
+                      color: textColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
                   IconButton(
                     onPressed: () {
                       debugPrint('salvo');
@@ -67,9 +150,11 @@ class Reports extends StatelessWidget {
                   )
                 ],
               ),
-              const TextField(
-                style: TextStyle(color: textColor),
-                decoration: InputDecoration(
+              TextField(
+                controller: _titleReportTextFieldController
+                  ..text = ReportsTexts.textReportTitle,
+                style: const TextStyle(color: textColor),
+                decoration: const InputDecoration(
                   labelText: 'Title',
                   labelStyle: TextStyle(color: textColor),
                   prefixIcon: Icon(
@@ -78,13 +163,15 @@ class Reports extends StatelessWidget {
                   ),
                 ),
               ),
-              const Expanded(
+              Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: TextField(
-                    decoration:
-                        InputDecoration(filled: true, fillColor: sideBarColor),
-                    style: TextStyle(color: textColor),
+                    controller: _detailsReportTextFieldController
+                      ..text = ReportsTexts.textDetails,
+                    decoration: const InputDecoration(
+                        filled: true, fillColor: sideBarColor),
+                    style: const TextStyle(color: textColor),
                     keyboardType: TextInputType.multiline,
                     minLines: 25,
                     maxLines: null,

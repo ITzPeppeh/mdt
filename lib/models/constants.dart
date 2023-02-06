@@ -8,6 +8,7 @@ const secondaryTextColor = Color.fromARGB(255, 71, 79, 87);
 
 const dbName = 'mdtBOX';
 const tableUsersName = 'users';
+const tableReportsName = 'reports';
 
 class ProfilesTexts {
   static String titleProfileName = 'Create Profile';
@@ -19,11 +20,25 @@ class ProfilesTexts {
 
   static void clearAll() {
     String user = '';
-    titleProfileName = user;
+    titleProfileName = 'Create Profile';
     textProfileName = user;
     textProfileID = user;
     textProfileURL = user;
     textProfileImageURL = 'https://i.imgur.com/ZSqeINh.png';
     detailsProfile = user;
+  }
+}
+
+class ReportsTexts {
+  static String titleReportName = 'Edit Report (#)';
+  static String textReportTitle = '';
+  static String textReportID = '';
+  static String textDetails = '';
+
+  static void clearAll() {
+    titleReportName = 'Edit Report (#)';
+    textReportTitle = '';
+    textReportID = '';
+    textDetails = '';
   }
 }
