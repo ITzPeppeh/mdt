@@ -1,9 +1,11 @@
+import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/constants.dart';
 
 class MyDatabase {
   static List<Civ> listUsers = [];
   static List<Report> listReports = [];
+  static List listCrimReports = [];
 
   final _myDB = Hive.box(dbName);
 
@@ -54,19 +56,21 @@ class MyDatabase {
     }
   }
 
-
-
   void createOrUpdateReport(Report newreport) {
     int ind = listReports.indexWhere((element) => element.id == newreport.id);
     if (ind == -1) {
       int newid = listReports.last.id + 1;
-      listReports.add(Report(id: newid, reportName: newreport.reportName, dateCreated: newreport.dateCreated, detailsReport: newreport.detailsReport)); //Increment ID
+      listReports.add(Report(
+          id: newid,
+          reportName: newreport.reportName,
+          dateCreated: newreport.dateCreated,
+          detailsReport: newreport.detailsReport,)); //FIXME: RELATED UPDATE
     } else {
       listReports[ind] = Report(
           id: listReports[ind].id,
           reportName: newreport.reportName,
           detailsReport: newreport.detailsReport,
-          dateCreated: listReports[ind].dateCreated);
+          dateCreated: listReports[ind].dateCreated,);
     }
   }
 
@@ -105,17 +109,17 @@ class MyDatabase {
           id: 1000,
           reportName: 'A BOOST',
           dateCreated: DateTime.utc(1989, 11, 9),
-          detailsReport: 'Suca'),
+          detailsReport: 'Suca',),
       Report(
           id: 1001,
           reportName: 'Karoline Flexx - Evading',
           dateCreated: DateTime.utc(2002, 6, 8),
-          detailsReport: 'Ciuccia'),
+          detailsReport: 'Ciuccia',),
       Report(
           id: 1002,
           reportName: 'Futo Boost - Grand Theft Auto',
           dateCreated: DateTime.utc(2015, 9, 5),
-          detailsReport: 'Cazzi'),
+          detailsReport: 'Cazzi',),
     ];
   }
 
@@ -133,7 +137,6 @@ class MyDatabase {
     Report temp = listReports.firstWhere((element) => element.id == ID);
     return temp;
   }
-
 }
 
 class Civ {
@@ -153,18 +156,19 @@ class Civ {
 }
 
 class Report {
-  final int id;
-  final String reportName;
-  final String detailsReport;
-  final DateTime dateCreated;
+  int id;
+  String reportName;
+  String detailsReport;
+  DateTime dateCreated;
 
-  
-
-  const Report(
-      {required this.id, required this.reportName, required this.dateCreated, required this.detailsReport});
+  Report(
+      {required this.id,
+      required this.reportName,
+      required this.dateCreated,
+      required this.detailsReport});
 }
 
-class Charge{
+class Charge {
   final String chargeName;
   const Charge({required this.chargeName});
 }

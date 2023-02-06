@@ -32,10 +32,12 @@ class _ReportsState extends State<Reports> {
       db.loadData();
     }
     _foundReports = MyDatabase.listReports;
+    _crimList = MyDatabase.listCrimReports;
     super.initState();
   }
 
   List _foundReports = [];
+  List _crimList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +217,10 @@ class _ReportsState extends State<Reports> {
                   const Expanded(child: SizedBox()),
                   IconButton(
                     onPressed: () {
-                      debugPrint('addo');
+                      setState(() {
+                      _crimList.add(ReportProfile());
+                      });
+
                     },
                     icon: const Icon(Icons.add),
                     color: textColor,
@@ -224,14 +229,12 @@ class _ReportsState extends State<Reports> {
                   )
                 ],
               ),
-              ReportProfile(
-                civName: 'John Charleston',
-                civID: 1,
-              ),
-              ReportProfile(
-                civName: 'Italia Pizza',
-                civID: 2,
-              )
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: _crimList.length,
+                itemBuilder:(context, index) {
+                return _crimList[index];
+              },),
             ]),
           ),
         ),

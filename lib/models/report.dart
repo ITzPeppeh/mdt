@@ -73,10 +73,7 @@ class _SearchReportState extends State<SearchReport> {
 }
 
 class ReportProfile extends StatefulWidget {
-  final civName;
-  final civID;
-
-  const ReportProfile({super.key, required this.civID, required this.civName});
+  const ReportProfile({super.key});
 
   @override
   State<ReportProfile> createState() => _ReportProfileState();
@@ -98,11 +95,16 @@ class _ReportProfileState extends State<ReportProfile> {
             children: [
               Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(
-                        "${widget.civName} (#${widget.civID.toString()})",
-                        style: const TextStyle(fontSize: 13)),
+                  const Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: SizedBox(
+                        width: 200,
+                        child: TextField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                              labelStyle: TextStyle(color: textColor),
+                              labelText: 'State ID'),
+                        )),
                   ),
                   const Expanded(child: SizedBox()),
                   IconButton(
