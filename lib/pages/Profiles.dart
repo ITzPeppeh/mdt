@@ -15,7 +15,11 @@ class Profiles extends StatefulWidget {
 class _ProfilesState extends State<Profiles> {
   final _myDB = Hive.box(dbName);
   MyDatabase db = MyDatabase();
-  String titleProfileName = 'Create Profile';
+  refresh() {
+    setState(() {});
+  }
+
+  TextEditingController _stateIdTextFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -24,7 +28,7 @@ class _ProfilesState extends State<Profiles> {
     } else {
       db.loadData();
     }
-    _foundUsers = db.listUsers;
+    _foundUsers = MyDatabase.listUsers;
     super.initState();
   }
 
@@ -61,9 +65,9 @@ class _ProfilesState extends State<Profiles> {
                   onChanged: (textValue) {
                     List results = [];
                     if (textValue.isEmpty) {
-                      results = db.listUsers;
+                      results = MyDatabase.listUsers;
                     } else {
-                      results = db.listUsers
+                      results = MyDatabase.listUsers
                           .where((element) => element.fullName
                               .toLowerCase()
                               .contains(textValue.toLowerCase()))
@@ -81,7 +85,10 @@ class _ProfilesState extends State<Profiles> {
                   itemBuilder: (context, index) {
                     List data = _foundUsers;
                     return SearchProfile(
-                        civID: data[index].id, civName: data[index].fullName);
+                      civID: data[index].id,
+                      civName: data[index].fullName,
+                      notifyParent: refresh,
+                    );
                   },
                 ),
               ]),
@@ -99,14 +106,45 @@ class _ProfilesState extends State<Profiles> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        titleProfileName,
+                        ProfilesTexts.titleProfileName,
                         style: const TextStyle(fontSize: 20),
                       ),
                     ),
                     const Expanded(child: SizedBox()),
                     IconButton(
                       onPressed: () {
-                        debugPrint('salvo');
+                        setState(() {
+                          ProfilesTexts.clearAll();
+                        });
+                      },
+                      icon: const Icon(Icons.create_new_folder),
+                      color: textColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          db.deleteUserFromId(2);
+                          db.updateDatabase();
+                          ProfilesTexts.clearAll();
+                        });
+                          /*MyDatabase.deleteUserFromId(
+                              int.parse(_stateIdTextFieldController.text));
+                          setState(() {
+                            ProfilesTexts.clearAll();
+                          });*/
+                      },
+                      icon: const Icon(Icons.delete),
+                      color: textColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          print('object2');
+                        });
                       },
                       icon: const Icon(Icons.save),
                       color: textColor,
@@ -121,10 +159,10 @@ class _ProfilesState extends State<Profiles> {
                         width: 200,
                         height: 200,
                         margin: const EdgeInsets.only(left: 5),
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                             image: DecorationImage(
                           image:
-                              NetworkImage('https://i.imgur.com/ZSqeINh.png'),
+                              NetworkImage(ProfilesTexts.textProfileImageURL),
                           fit: BoxFit.cover,
                         ))),
                     Padding(
@@ -132,33 +170,39 @@ class _ProfilesState extends State<Profiles> {
                       child: Column(
                         children: [
                           Row(
-                            children: const [
+                            children: [
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    decoration: InputDecoration(
+                                    controller: _stateIdTextFieldController
+                                      ..text = ProfilesTexts.textProfileName,
+                                    decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
                                         labelText: 'State ID'),
                                   )),
                             ],
                           ),
                           Row(
-                            children: const [
+                            children: [
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    decoration: InputDecoration(
+                                    controller: TextEditingController()
+                                      ..text = ProfilesTexts.textProfileID,
+                                    decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
                                         labelText: 'Full Name'),
                                   )),
                             ],
                           ),
                           Row(
-                            children: const [
+                            children: [
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    decoration: InputDecoration(
+                                    controller: TextEditingController()
+                                      ..text = ProfilesTexts.textProfileURL,
+                                    decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
                                         labelText: 'Profile Image URL'),
                                   )),
@@ -169,16 +213,18 @@ class _ProfilesState extends State<Profiles> {
                     )
                   ],
                 ),
-                const Expanded(
+                Expanded(
                   child: Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: TextField(
-                      decoration: InputDecoration(
+                      controller: TextEditingController()
+                        ..text = ProfilesTexts.detailsProfile,
+                      decoration: const InputDecoration(
                           filled: true,
                           fillColor: sideBarColor,
                           hintText: 'Document content goes here...',
                           hintStyle: TextStyle(color: secondaryTextColor)),
-                      style: TextStyle(color: textColor),
+                      style: const TextStyle(color: textColor),
                       keyboardType: TextInputType.multiline,
                       minLines: 25,
                       maxLines: null,

@@ -14,7 +14,7 @@ void main() async{
   runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          textTheme: const TextTheme(
+          textTheme: const TextTheme( 
             bodyText1: TextStyle(),
             bodyText2: TextStyle(),
           ).apply(

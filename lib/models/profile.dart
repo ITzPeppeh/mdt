@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
+import 'package:mdt/models/database.dart';
 
 class TabProfile extends StatelessWidget {
   final title;
@@ -27,23 +28,38 @@ class TabProfile extends StatelessWidget {
   }
 }
 
-class SearchProfile extends StatelessWidget {
+class SearchProfile extends StatefulWidget {
   final String civName;
   final int civID;
+  final Function() notifyParent;
 
   const SearchProfile({
     super.key,
     required this.civID,
     required this.civName,
+    required this.notifyParent,
   });
 
+  @override
+  State<SearchProfile> createState() => _SearchProfileState();
+}
+
+class _SearchProfileState extends State<SearchProfile> {
   @override
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          print("Tapped $civName - $civID");
+          Civ user = MyDatabase.getFromID(widget.civID);
+          ProfilesTexts.titleProfileName = user.fullName;
+          ProfilesTexts.textProfileName = user.fullName;
+          ProfilesTexts.textProfileID = user.id.toString();
+          ProfilesTexts.textProfileURL = user.imageProfileURL;
+          ProfilesTexts.textProfileImageURL = user.imageProfileURL;
+          ProfilesTexts.detailsProfile = user.detailsProfile;
+          widget.notifyParent();
+          print("Tapped ${widget.civName} - ${widget.civID}");
         },
         child: Row(
           children: [
@@ -55,11 +71,12 @@ class SearchProfile extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(5.0),
-                    child: Text(civName, style: const TextStyle(fontSize: 13)),
+                    child: Text(widget.civName,
+                        style: const TextStyle(fontSize: 13)),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(2.0),
-                    child: Text("ID: ${civID.toString()}",
+                    child: Text("ID: ${widget.civID.toString()}",
                         style: const TextStyle(fontSize: 13)),
                   )
                 ],

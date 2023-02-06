@@ -42,12 +42,3 @@ SidebarX mySidebar(BuildContext context, {int selectIdx = 0}) {
     ],
   );
 }
-/*
-class mySidebar extends StatelessWidget {
-  const mySidebar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}*/
