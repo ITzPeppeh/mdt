@@ -10,3 +10,4 @@ Run this commands in project folder:
 
 #Fix Delete, Save profile and implement licenses
 #Fix Delete, Save report and implement criminal
+#Fix Scroll ListView Charges
