@@ -3,7 +3,6 @@ import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/report.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/database.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class Reports extends StatefulWidget {
   const Reports({super.key});
@@ -13,55 +12,52 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
-  final _myDB = Hive.box(dbName);
-  MyDatabase db = MyDatabase();
   List _foundReports = [];
   List _crimWidgetList = [];
+  TextEditingController titleReportTextFieldController =
+      TextEditingController();
+  TextEditingController detailsReportTextFieldController =
+      TextEditingController();
 
-  refresh() {
+  refreshProfileReps() {
     setState(() {
       _crimWidgetList = [];
       if (ReportsTexts.textReportID == '') return;
 
       int id = int.parse(ReportsTexts.textReportID);
-      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
-        if (MyDatabase.listCrimReports[i].idReport == id) {
+
+      for (var crim in MyDatabase.listCrimReports) {
+        if (crim.idReport == id) {
           _crimWidgetList.add(ReportProfile(
-              notifyParent: addToReport,
-              stateID: MyDatabase.listCrimReports[i].idCiv.toString()));
+            notifyParent: addCrimToReport,
+            stateID: crim.idCiv.toString(),
+            isWarrant: crim.isWarrant,
+          ));
         }
       }
     });
   }
 
-  addToReport(bool deleteReport, List lol) {
+  addCrimToReport(bool deleteReport, List civAndWarrant) {
+    /* 2in1 */
+    if (ReportsTexts.textReportID == '') return;
     if (!deleteReport) {
-      if (ReportsTexts.textReportID == '') return;
-      if (lol[0] == '') return;
-      print(lol[1]);
-      MyDatabase.listCrimReports.add(Arrested(
+      if (civAndWarrant[0] == '') return;
+
+      MyDatabase.addCrimReport(Arrested(
           idReport: int.parse(ReportsTexts.textReportID),
-          idCiv: int.parse(lol[0]),
-          isWarrant: lol[1]));
-      
-      MyDatabase.listUsers.forEach((element) {
-        print('---');
-        print(element.id);
-        print(lol[1]);
-        print('--');
-         if(element.id == int.parse(lol[0]) && element.isWarant != lol[1]) {
-          print('dentro');
-        element.isWarant = lol[1];}});
+          idCiv: int.parse(civAndWarrant[0]),
+          isWarrant: civAndWarrant[1]));
+
+      MyDatabase.updateWarrant(int.parse(civAndWarrant[0]), civAndWarrant[1]);
+
       setState(() {
         ReportsTexts.clearAll();
         /*TODO: DELETE ONLY HIS WIDGET(?)*/
         _crimWidgetList.clear();
       });
     } else {
-      if (ReportsTexts.textReportID == '') return;
-
-      MyDatabase.listCrimReports.removeWhere((element) =>
-          element.idReport.toString() == ReportsTexts.textReportID);
+      MyDatabase.delCrimReport(ReportsTexts.textReportID);
 
       setState(() {
         ReportsTexts.clearAll();
@@ -70,18 +66,9 @@ class _ReportsState extends State<Reports> {
     }
   }
 
-  TextEditingController _titleReportTextFieldController =
-      TextEditingController();
-  TextEditingController _detailsReportTextFieldController =
-      TextEditingController();
-
   @override
   void initState() {
-    if (_myDB.get(tableReportsName) == null) {
-      db.createInitialData();
-    } else {
-      db.loadData();
-    }
+    MyDatabase.initDatabase();
     _foundReports = MyDatabase.listReports;
     super.initState();
   }
@@ -123,7 +110,6 @@ class _ReportsState extends State<Reports> {
                             .contains(textValue.toLowerCase()))
                         .toList();
                   }
-
                   setState(() {
                     _foundReports = results;
                   });
@@ -138,7 +124,7 @@ class _ReportsState extends State<Reports> {
                     title: data[index].reportName,
                     id: data[index].id,
                     dateCreate: data[index].dateCreated,
-                    notifyParent: refresh,
+                    notifyParent: refreshProfileReps,
                   );
                 },
               ),
@@ -169,13 +155,13 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.create_new_folder),
                     color: textColor,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                    splashColor: transColor,
+                    highlightColor: transColor,
                   ),
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        db.deleteReportFromId(int.parse(
+                        MyDatabase.deleteReportFromId(int.parse(
                             ReportsTexts.textReportID == ''
                                 ? '-1'
                                 : ReportsTexts.textReportID));
@@ -185,14 +171,14 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.delete),
                     color: textColor,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                    splashColor: transColor,
+                    highlightColor: transColor,
                   ),
                   IconButton(
                     onPressed: () {
                       if (ReportsTexts.textReportTitle == '') return;
                       setState(() {
-                        db.createOrUpdateReport(Report(
+                        MyDatabase.addOrUpdateReport(Report(
                             id: int.parse(ReportsTexts.textReportID == ''
                                 ? '-1'
                                 : ReportsTexts.textReportID),
@@ -205,8 +191,8 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.save),
                     color: textColor,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                    splashColor: transColor,
+                    highlightColor: transColor,
                   )
                 ],
               ),
@@ -214,7 +200,7 @@ class _ReportsState extends State<Reports> {
                 onChanged: (value) {
                   ReportsTexts.textReportTitle = value;
                 },
-                controller: _titleReportTextFieldController
+                controller: titleReportTextFieldController
                   ..text = ReportsTexts.textReportTitle,
                 style: const TextStyle(color: textColor),
                 decoration: const InputDecoration(
@@ -233,7 +219,7 @@ class _ReportsState extends State<Reports> {
                     onChanged: (value) {
                       ReportsTexts.textDetails = value;
                     },
-                    controller: _detailsReportTextFieldController
+                    controller: detailsReportTextFieldController
                       ..text = ReportsTexts.textDetails,
                     decoration: const InputDecoration(
                         filled: true, fillColor: sideBarColor),
@@ -266,13 +252,16 @@ class _ReportsState extends State<Reports> {
                     onPressed: () {
                       setState(() {
                         _crimWidgetList.add(ReportProfile(
-                            notifyParent: addToReport, stateID: ''));
+                          notifyParent: addCrimToReport,
+                          stateID: '',
+                          isWarrant: false,
+                        ));
                       });
                     },
                     icon: const Icon(Icons.add),
                     color: textColor,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                    splashColor: transColor,
+                    highlightColor: transColor,
                   )
                 ],
               ),
@@ -280,8 +269,7 @@ class _ReportsState extends State<Reports> {
                 shrinkWrap: true,
                 itemCount: _crimWidgetList.length,
                 itemBuilder: (context, index) {
-                  return _crimWidgetList[
-                      index];
+                  return _crimWidgetList[index];
                 },
               ),
             ]),

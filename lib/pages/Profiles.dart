@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/profile.dart';
 import 'package:mdt/models/sidebar.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/database.dart';
-
 
 class Profiles extends StatefulWidget {
   const Profiles({super.key});
@@ -14,42 +12,35 @@ class Profiles extends StatefulWidget {
 }
 
 class _ProfilesState extends State<Profiles> {
-  final _myDB = Hive.box(dbName);
-  MyDatabase db = MyDatabase();
-  List _crimWidgetList = [];
+  List _reportWidgetList = [];
+  List _foundUsers = [];
+  TextEditingController stateIdTextFieldController = TextEditingController();
+  TextEditingController fullNameTextFieldController = TextEditingController();
+  TextEditingController imageURLTextFieldController = TextEditingController();
+  TextEditingController detailsTextFieldController = TextEditingController();
 
-  refresh() {
+  refreshProfileReports() {
     setState(() {
-      _crimWidgetList = [];
+      _reportWidgetList = [];
       if (ProfilesTexts.textProfileID == '') return;
 
       int id = int.parse(ProfilesTexts.textProfileID);
-      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
-        if (MyDatabase.listCrimReports[i].idCiv == id) {
-          _crimWidgetList.add(TabProfile(title: "Appears in report ID: ${MyDatabase.listCrimReports[i].idReport}"));
+
+      for (var crim in MyDatabase.listCrimReports) {
+        if (crim.idCiv == id) {
+          _reportWidgetList
+              .add(TabProfile(title: "Appears in report ID: ${crim.idReport}"));
         }
       }
-
     });
   }
 
-  TextEditingController _stateIdTextFieldController = TextEditingController();
-  TextEditingController _fullNameTextFieldController = TextEditingController();
-  TextEditingController _imageURLTextFieldController = TextEditingController();
-  TextEditingController _detailsTextFieldController = TextEditingController();
-
   @override
   void initState() {
-    if (_myDB.get(tableUsersName) == null) {
-      db.createInitialData();
-    } else {
-      db.loadData();
-    }
+    MyDatabase.initDatabase();
     _foundUsers = MyDatabase.listUsers;
     super.initState();
   }
-
-  List _foundUsers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +49,7 @@ class _ProfilesState extends State<Profiles> {
         children: [
           mySidebar(context, selectIdx: 1),
           Expanded(
-            // Notepad Box
+            // All Profiles Box
             child: Container(
               color: colorBox,
               margin: const EdgeInsets.all(6),
@@ -90,7 +81,6 @@ class _ProfilesState extends State<Profiles> {
                               .contains(textValue.toLowerCase()))
                           .toList();
                     }
-
                     setState(() {
                       _foundUsers = results;
                     });
@@ -104,7 +94,7 @@ class _ProfilesState extends State<Profiles> {
                     return SearchProfile(
                       civID: data[index].id,
                       civName: data[index].fullName,
-                      notifyParent: refresh,
+                      notifyParent: refreshProfileReports,
                     );
                   },
                 ),
@@ -112,7 +102,7 @@ class _ProfilesState extends State<Profiles> {
             ),
           ),
           Expanded(
-            // Notepad Box
+            // Report Box
             child: Container(
               width: 150,
               color: colorBox,
@@ -131,59 +121,56 @@ class _ProfilesState extends State<Profiles> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          _crimWidgetList = [];
+                          _reportWidgetList = [];
                           ProfilesTexts.clearAll();
-                          
                         });
                       },
                       icon: const Icon(Icons.create_new_folder),
                       color: textColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
+                      splashColor: transColor,
+                      highlightColor: transColor,
                     ),
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          db.deleteUserFromId(int.parse(
-                              _stateIdTextFieldController.text == ''
+                          MyDatabase.delUserFromId(int.parse(
+                              stateIdTextFieldController.text == ''
                                   ? '-1'
-                                  : _stateIdTextFieldController.text));
+                                  : stateIdTextFieldController.text));
                           _foundUsers = MyDatabase.listUsers;
-                          
-                          _crimWidgetList = [];
+
+                          _reportWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
                       icon: const Icon(Icons.delete),
                       color: textColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
+                      splashColor: transColor,
+                      highlightColor: transColor,
                     ),
                     IconButton(
                       onPressed: () {
-                        if (_stateIdTextFieldController.text == '') return;
+                        if (stateIdTextFieldController.text == '') return;
                         setState(() {
-                          db.createOrUpdateUser(Civ(
+                          MyDatabase.addOrUpdateUser(Civ(
                               id: int.parse(
-                                  _stateIdTextFieldController.text == ''
+                                  stateIdTextFieldController.text == ''
                                       ? '-1'
-                                      : _stateIdTextFieldController.text),
-                              fullName: _fullNameTextFieldController.text,
+                                      : stateIdTextFieldController.text),
+                              fullName: fullNameTextFieldController.text,
                               isWarant: false,
-                              imageProfileURL:
-                                  _imageURLTextFieldController.text,
-                              detailsProfile:
-                                  _detailsTextFieldController.text));
+                              imageProfileURL: imageURLTextFieldController.text,
+                              detailsProfile: detailsTextFieldController.text));
+
                           _foundUsers = MyDatabase.listUsers;
-                          
-                          _crimWidgetList = [];
+                          _reportWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
                       icon: const Icon(Icons.save),
                       color: textColor,
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
+                      splashColor: transColor,
+                      highlightColor: transColor,
                     )
                   ],
                 ),
@@ -209,7 +196,7 @@ class _ProfilesState extends State<Profiles> {
                                   width: 200,
                                   child: TextField(
                                     keyboardType: TextInputType.number,
-                                    controller: _stateIdTextFieldController
+                                    controller: stateIdTextFieldController
                                       ..text = ProfilesTexts.textProfileID,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -222,7 +209,7 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: _fullNameTextFieldController
+                                    controller: fullNameTextFieldController
                                       ..text = ProfilesTexts.textProfileName,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -235,7 +222,7 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: _imageURLTextFieldController
+                                    controller: imageURLTextFieldController
                                       ..text = ProfilesTexts.textProfileURL,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -252,7 +239,7 @@ class _ProfilesState extends State<Profiles> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
-                      controller: _detailsTextFieldController
+                      controller: detailsTextFieldController
                         ..text = ProfilesTexts.detailsProfile,
                       decoration: const InputDecoration(
                           filled: true,
@@ -287,13 +274,12 @@ class _ProfilesState extends State<Profiles> {
                   ],
                 ),
                 ListView.builder(
-                shrinkWrap: true,
-                itemCount: _crimWidgetList.length,
-                itemBuilder: (context, index) {
-                  return _crimWidgetList[
-                      index];
-                },
-              ),
+                  shrinkWrap: true,
+                  itemCount: _reportWidgetList.length,
+                  itemBuilder: (context, index) {
+                    return _reportWidgetList[index];
+                  },
+                ),
               ]),
             ),
           )

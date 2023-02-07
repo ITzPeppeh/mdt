@@ -41,7 +41,8 @@ class WarrantBox extends StatelessWidget {
                   const Expanded(child: SizedBox()),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text("ID: ${civID.toString()}", style: const TextStyle(fontSize: 15)),
+                    child: Text("ID: ${civID.toString()}",
+                        style: const TextStyle(fontSize: 15)),
                   )
                 ],
               )

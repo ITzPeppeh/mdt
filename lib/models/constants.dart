@@ -5,10 +5,12 @@ const colorBackground = Color.fromARGB(255, 54, 77, 97);
 const colorBox = Color.fromARGB(255, 32, 56, 76);
 const textColor = Color.fromARGB(255, 255, 255, 255);
 const secondaryTextColor = Color.fromARGB(255, 71, 79, 87);
+const transColor = Colors.transparent;
 
 const dbName = 'mdtBOX';
 const tableUsersName = 'users';
 const tableReportsName = 'reports';
+const tableCrimReportsName = 'crimreports';
 
 class ProfilesTexts {
   static String titleProfileName = 'Create Profile';

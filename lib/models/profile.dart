@@ -61,7 +61,7 @@ class _SearchProfileState extends State<SearchProfile> {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          Civ user = MyDatabase.getFromID(widget.civID);
+          Civ user = MyDatabase.getUserFromId(widget.civID);
           ProfilesTexts.titleProfileName = user.fullName;
           ProfilesTexts.textProfileName = user.fullName;
           ProfilesTexts.textProfileID = user.id.toString();
