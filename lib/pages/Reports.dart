@@ -16,7 +16,31 @@ class _ReportsState extends State<Reports> {
   final _myDB = Hive.box(dbName);
   MyDatabase db = MyDatabase();
   refresh() {
-    setState(() {});
+    setState(() {
+      if (ReportsTexts.textReportID == '') return;
+
+      int id = int.parse(ReportsTexts.textReportID);
+
+      _crimList = MyDatabase.listCrimReports.where((element) => element.id == id).toList();
+    });
+  }
+
+  addToReport(List lol) {
+    if (ReportsTexts.textReportID == '') return;
+    if (lol[0] == '') return;
+    print('object');
+
+    /*add warrant to profile OR in dashboard list criminals*/ 
+
+    MyDatabase.listCrimReports.add(Arrested(
+        idReport: int.parse(ReportsTexts.textReportID),
+        idCiv: lol[0],
+        isWarrant: lol[1]));
+
+    setState(() {
+      ReportsTexts.clearAll();
+      _crimList.clear();
+    });
   }
 
   TextEditingController _titleReportTextFieldController =
@@ -218,9 +242,8 @@ class _ReportsState extends State<Reports> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                      _crimList.add(ReportProfile());
+                        _crimList.add(ReportProfile(notifyParent: addToReport));
                       });
-
                     },
                     icon: const Icon(Icons.add),
                     color: textColor,
@@ -232,9 +255,10 @@ class _ReportsState extends State<Reports> {
               ListView.builder(
                 shrinkWrap: true,
                 itemCount: _crimList.length,
-                itemBuilder:(context, index) {
-                return _crimList[index];
-              },),
+                itemBuilder: (context, index) {
+                  return _crimList[index];
+                },
+              ),
             ]),
           ),
         ),

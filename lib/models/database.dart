@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/constants.dart';
 
@@ -166,6 +165,13 @@ class Report {
       required this.reportName,
       required this.dateCreated,
       required this.detailsReport});
+}
+
+class Arrested {
+  final int idReport;
+  final int idCiv;
+  final bool isWarrant;
+  Arrested({required this.idReport, required this.idCiv, required this.isWarrant});
 }
 
 class Charge {

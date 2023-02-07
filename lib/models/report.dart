@@ -73,7 +73,9 @@ class _SearchReportState extends State<SearchReport> {
 }
 
 class ReportProfile extends StatefulWidget {
-  const ReportProfile({super.key});
+  final Function(List) notifyParent;
+  
+  const ReportProfile({super.key, required this.notifyParent});
 
   @override
   State<ReportProfile> createState() => _ReportProfileState();
@@ -81,6 +83,9 @@ class ReportProfile extends StatefulWidget {
 
 class _ReportProfileState extends State<ReportProfile> {
   bool? isWarrant = false;
+
+  TextEditingController _stateIDTextFieldController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -95,13 +100,14 @@ class _ReportProfileState extends State<ReportProfile> {
             children: [
               Row(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(5.0),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
                     child: SizedBox(
                         width: 200,
                         child: TextField(
+                          controller: _stateIDTextFieldController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                               labelStyle: TextStyle(color: textColor),
                               labelText: 'State ID'),
                         )),
@@ -118,6 +124,8 @@ class _ReportProfileState extends State<ReportProfile> {
                   ),
                   IconButton(
                     onPressed: () {
+                      widget.notifyParent([_stateIDTextFieldController.text, isWarrant]); // PARAMETRO
+
                       debugPrint('salvo prof');
                     },
                     icon: const Icon(Icons.save),
