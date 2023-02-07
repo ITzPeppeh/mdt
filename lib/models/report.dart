@@ -73,9 +73,10 @@ class _SearchReportState extends State<SearchReport> {
 }
 
 class ReportProfile extends StatefulWidget {
-  final Function(List) notifyParent;
+  final String stateID;
+  final Function(bool, List) notifyParent;
   
-  const ReportProfile({super.key, required this.notifyParent});
+  const ReportProfile({super.key, required this.notifyParent, required this.stateID});
 
   @override
   State<ReportProfile> createState() => _ReportProfileState();
@@ -86,6 +87,11 @@ class _ReportProfileState extends State<ReportProfile> {
 
   TextEditingController _stateIDTextFieldController =
       TextEditingController();
+
+    @override
+    void initState(){
+      _stateIDTextFieldController.text = widget.stateID;
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +121,7 @@ class _ReportProfileState extends State<ReportProfile> {
                   const Expanded(child: SizedBox()),
                   IconButton(
                     onPressed: () {
-                      debugPrint('elimino prof');
+                      widget.notifyParent(true,[_stateIDTextFieldController.text]);
                     },
                     icon: const Icon(Icons.delete),
                     color: textColor,
@@ -124,9 +130,7 @@ class _ReportProfileState extends State<ReportProfile> {
                   ),
                   IconButton(
                     onPressed: () {
-                      widget.notifyParent([_stateIDTextFieldController.text, isWarrant]); // PARAMETRO
-
-                      debugPrint('salvo prof');
+                      widget.notifyParent(false, [_stateIDTextFieldController.text, isWarrant]);
                     },
                     icon: const Icon(Icons.save),
                     color: textColor,
@@ -140,6 +144,7 @@ class _ReportProfileState extends State<ReportProfile> {
                   Checkbox(
                     value: isWarrant,
                     onChanged: (value) {
+
                       setState(() {
                         isWarrant = value;
                       });

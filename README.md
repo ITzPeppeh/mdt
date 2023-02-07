@@ -8,7 +8,7 @@ Run this commands in project folder:
 `flutter pub get`
 
 
-#implement curretly reports
-#implement criminal
+#implement isWarrant, civ already have attr isWarrant
 #Fix Scroll ListView Charges
 #User provider replacing listview
+####Little bug scroll between reports, see same crim

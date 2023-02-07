@@ -4,13 +4,15 @@ import 'package:mdt/models/constants.dart';
 class MyDatabase {
   static List<Civ> listUsers = [];
   static List<Report> listReports = [];
-  static List listCrimReports = [];
+  static List<Arrested> listCrimReports = [];
 
   final _myDB = Hive.box(dbName);
 
-  List getWarrants() {
+  static List getWarrants() {
     List temps = [];
     for (var i = 0; i < listUsers.length; i++) {
+      print(listUsers[i].fullName);
+      print(listUsers[i].isWarant);
       if (listUsers[i].isWarant) {
         temps.add({
           'fullName': listUsers[i].fullName,
@@ -141,11 +143,11 @@ class MyDatabase {
 class Civ {
   final int id;
   final String fullName;
-  final bool isWarant;
+  bool isWarant;
   final String imageProfileURL;
   final String detailsProfile;
 
-  const Civ({
+  Civ({
     required this.id,
     required this.fullName,
     required this.isWarant,

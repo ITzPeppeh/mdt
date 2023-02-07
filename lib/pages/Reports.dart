@@ -15,32 +15,59 @@ class Reports extends StatefulWidget {
 class _ReportsState extends State<Reports> {
   final _myDB = Hive.box(dbName);
   MyDatabase db = MyDatabase();
+  List _foundReports = [];
+  List _crimWidgetList = [];
+
   refresh() {
     setState(() {
+      _crimWidgetList = [];
       if (ReportsTexts.textReportID == '') return;
 
       int id = int.parse(ReportsTexts.textReportID);
-
-      _crimList = MyDatabase.listCrimReports.where((element) => element.id == id).toList();
+      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
+        if (MyDatabase.listCrimReports[i].idReport == id) {
+          _crimWidgetList.add(ReportProfile(
+              notifyParent: addToReport,
+              stateID: MyDatabase.listCrimReports[i].idCiv.toString()));
+        }
+      }
     });
   }
 
-  addToReport(List lol) {
-    if (ReportsTexts.textReportID == '') return;
-    if (lol[0] == '') return;
-    print('object');
+  addToReport(bool deleteReport, List lol) {
+    if (!deleteReport) {
+      if (ReportsTexts.textReportID == '') return;
+      if (lol[0] == '') return;
+      print(lol[1]);
+      MyDatabase.listCrimReports.add(Arrested(
+          idReport: int.parse(ReportsTexts.textReportID),
+          idCiv: int.parse(lol[0]),
+          isWarrant: lol[1]));
+      
+      MyDatabase.listUsers.forEach((element) {
+        print('---');
+        print(element.id);
+        print(lol[1]);
+        print('--');
+         if(element.id == int.parse(lol[0]) && element.isWarant != lol[1]) {
+          print('dentro');
+        element.isWarant = lol[1];}});
+      setState(() {
+        ReportsTexts.clearAll();
+        /*TODO: DELETE ONLY HIS WIDGET(?)*/
+        _crimWidgetList.clear();
+      });
+    } else {
+      if (ReportsTexts.textReportID == '') return;
 
-    /*add warrant to profile OR in dashboard list criminals*/ 
+      MyDatabase.listCrimReports.removeWhere((element) =>
+          element.idReport.toString() == ReportsTexts.textReportID);
 
-    MyDatabase.listCrimReports.add(Arrested(
-        idReport: int.parse(ReportsTexts.textReportID),
-        idCiv: lol[0],
-        isWarrant: lol[1]));
-
-    setState(() {
-      ReportsTexts.clearAll();
-      _crimList.clear();
-    });
+      setState(() {
+        ReportsTexts.clearAll();
+        _crimWidgetList.clear();
+      });
+    }
   }
 
   TextEditingController _titleReportTextFieldController =
@@ -56,12 +83,8 @@ class _ReportsState extends State<Reports> {
       db.loadData();
     }
     _foundReports = MyDatabase.listReports;
-    _crimList = MyDatabase.listCrimReports;
     super.initState();
   }
-
-  List _foundReports = [];
-  List _crimList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +92,6 @@ class _ReportsState extends State<Reports> {
       body: Row(children: [
         mySidebar(context, selectIdx: 2),
         Expanded(
-          // Notepad Box
           child: Container(
             color: colorBox,
             margin: const EdgeInsets.all(6),
@@ -142,6 +164,7 @@ class _ReportsState extends State<Reports> {
                     onPressed: () {
                       setState(() {
                         ReportsTexts.clearAll();
+                        _crimWidgetList.clear();
                       });
                     },
                     icon: const Icon(Icons.create_new_folder),
@@ -242,7 +265,8 @@ class _ReportsState extends State<Reports> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        _crimList.add(ReportProfile(notifyParent: addToReport));
+                        _crimWidgetList.add(ReportProfile(
+                            notifyParent: addToReport, stateID: ''));
                       });
                     },
                     icon: const Icon(Icons.add),
@@ -254,9 +278,10 @@ class _ReportsState extends State<Reports> {
               ),
               ListView.builder(
                 shrinkWrap: true,
-                itemCount: _crimList.length,
+                itemCount: _crimWidgetList.length,
                 itemBuilder: (context, index) {
-                  return _crimList[index];
+                  return _crimWidgetList[
+                      index];
                 },
               ),
             ]),

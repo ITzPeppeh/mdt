@@ -2,28 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/database.dart';
 
-class TabProfile extends StatelessWidget {
+class TabProfile extends StatefulWidget {
   final title;
   const TabProfile({super.key, required this.title});
 
   @override
+  State<TabProfile> createState() => _TabProfileState();
+}
+
+class _TabProfileState extends State<TabProfile> {
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-            child: Container(
-          margin: const EdgeInsets.only(bottom: 5),
-          height: 100,
-          color: colorBox,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              title,
-              style: const TextStyle(fontSize: 15),
-            ),
-          ),
-        ))
-      ],
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
+        onTap: () {Navigator.pushNamed(context, '/reports');},
+        child: Row(
+          children: [
+            Expanded(
+                child: Container(
+              height: 50,
+              color: sideBarColor,
+              child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Center(
+                      child: Text(widget.title,
+                          style: const TextStyle(fontSize: 18)),
+                    ),
+                  ),
+            ))
+          ],
+        ),
+      ),
     );
   }
 }

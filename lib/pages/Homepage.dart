@@ -40,22 +40,31 @@ class _HomePageState extends State<HomePage> {
           margin: const EdgeInsets.only(top: 6, bottom: 6, left: 6),
           child: Column(children: [
             Row(
-              children: const [
-                Padding(
+              children: [
+                const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Text(
                     'Warrants',
                     style: TextStyle(fontSize: 20),
                   ),
                 ),
-                //SEARCH BAR TextField ?
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                      });
+                    },
+                    icon: const Icon(Icons.refresh),
+                    color: textColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
               ],
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: db.getWarrants().length,
+              itemCount: MyDatabase.getWarrants().length,
               itemBuilder: (context, index) {
-                List data = db.getWarrants();
+                List data = MyDatabase.getWarrants();
                 return WarrantBox(
                     civID: data[index]['id'],
                     civName: data[index]['fullName'],

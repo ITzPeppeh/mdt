@@ -5,6 +5,7 @@ import 'package:mdt/models/sidebar.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/database.dart';
 
+
 class Profiles extends StatefulWidget {
   const Profiles({super.key});
 
@@ -15,8 +16,21 @@ class Profiles extends StatefulWidget {
 class _ProfilesState extends State<Profiles> {
   final _myDB = Hive.box(dbName);
   MyDatabase db = MyDatabase();
+  List _crimWidgetList = [];
+
   refresh() {
-    setState(() {});
+    setState(() {
+      _crimWidgetList = [];
+      if (ProfilesTexts.textProfileID == '') return;
+
+      int id = int.parse(ProfilesTexts.textProfileID);
+      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
+        if (MyDatabase.listCrimReports[i].idCiv == id) {
+          _crimWidgetList.add(TabProfile(title: "Appears in report ID: ${MyDatabase.listCrimReports[i].idReport}"));
+        }
+      }
+
+    });
   }
 
   TextEditingController _stateIdTextFieldController = TextEditingController();
@@ -117,7 +131,9 @@ class _ProfilesState extends State<Profiles> {
                     IconButton(
                       onPressed: () {
                         setState(() {
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
+                          
                         });
                       },
                       icon: const Icon(Icons.create_new_folder),
@@ -133,6 +149,8 @@ class _ProfilesState extends State<Profiles> {
                                   ? '-1'
                                   : _stateIdTextFieldController.text));
                           _foundUsers = MyDatabase.listUsers;
+                          
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
@@ -157,6 +175,8 @@ class _ProfilesState extends State<Profiles> {
                               detailsProfile:
                                   _detailsTextFieldController.text));
                           _foundUsers = MyDatabase.listUsers;
+                          
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
@@ -266,41 +286,14 @@ class _ProfilesState extends State<Profiles> {
                     ),
                   ],
                 ),
-                TextField(
-                  decoration: const InputDecoration(
-                      labelStyle: TextStyle(color: textColor),
-                      labelText: 'Search',
-                      suffixIcon: Icon(Icons.search)),
-                  onChanged: (textValue) {
-                    /*
-                    List results = [];
-                    if (textValue.isEmpty) {
-                      results = MyDatabase.listUsers;
-                    } else {
-                      results = MyDatabase.listUsers
-                          .where((element) => element.fullName
-                              .toLowerCase()
-                              .contains(textValue.toLowerCase()))
-                          .toList();
-                    }
-
-                    setState(() {
-                      _foundUsers = results;
-                    });*/
-                  },
-                ), /*
                 ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _foundUsers.length,
-                  itemBuilder: (context, index) {
-                    List data = _foundUsers;
-                    return SearchProfile(
-                      civID: data[index].id,
-                      civName: data[index].fullName,
-                      notifyParent: refresh,
-                    );
-                  },
-                ),*/
+                shrinkWrap: true,
+                itemCount: _crimWidgetList.length,
+                itemBuilder: (context, index) {
+                  return _crimWidgetList[
+                      index];
+                },
+              ),
               ]),
             ),
           )
