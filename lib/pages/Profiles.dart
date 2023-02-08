@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/profile.dart';
 import 'package:mdt/models/sidebar.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/database.dart';
+
 
 class Profiles extends StatefulWidget {
   const Profiles({super.key});
@@ -12,35 +14,42 @@ class Profiles extends StatefulWidget {
 }
 
 class _ProfilesState extends State<Profiles> {
-  List _reportWidgetList = [];
-  List _foundUsers = [];
-  TextEditingController stateIdTextFieldController = TextEditingController();
-  TextEditingController fullNameTextFieldController = TextEditingController();
-  TextEditingController imageURLTextFieldController = TextEditingController();
-  TextEditingController detailsTextFieldController = TextEditingController();
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
+  List _crimWidgetList = [];
 
-  refreshProfileReports() {
+  refresh() {
     setState(() {
-      _reportWidgetList = [];
+      _crimWidgetList = [];
       if (ProfilesTexts.textProfileID == '') return;
 
       int id = int.parse(ProfilesTexts.textProfileID);
-
-      for (var crim in MyDatabase.listCrimReports) {
-        if (crim.idCiv == id) {
-          _reportWidgetList
-              .add(TabProfile(title: "Appears in report ID: ${crim.idReport}"));
+      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
+        if (MyDatabase.listCrimReports[i].idCiv == id) {
+          _crimWidgetList.add(TabProfile(title: "Appears in report ID: ${MyDatabase.listCrimReports[i].idReport}"));
         }
       }
+
     });
   }
 
+  TextEditingController _stateIdTextFieldController = TextEditingController();
+  TextEditingController _fullNameTextFieldController = TextEditingController();
+  TextEditingController _imageURLTextFieldController = TextEditingController();
+  TextEditingController _detailsTextFieldController = TextEditingController();
+
   @override
   void initState() {
-    MyDatabase.initDatabase();
+    if (_myDB.get(tableUsersName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
     _foundUsers = MyDatabase.listUsers;
     super.initState();
   }
+
+  List _foundUsers = [];
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +58,7 @@ class _ProfilesState extends State<Profiles> {
         children: [
           mySidebar(context, selectIdx: 1),
           Expanded(
-            // All Profiles Box
+            // Notepad Box
             child: Container(
               color: colorBox,
               margin: const EdgeInsets.all(6),
@@ -66,6 +75,7 @@ class _ProfilesState extends State<Profiles> {
                   ],
                 ),
                 TextField(
+                  style: const TextStyle(color: textColor),
                   decoration: const InputDecoration(
                       labelStyle: TextStyle(color: textColor),
                       labelText: 'Search',
@@ -81,6 +91,7 @@ class _ProfilesState extends State<Profiles> {
                               .contains(textValue.toLowerCase()))
                           .toList();
                     }
+
                     setState(() {
                       _foundUsers = results;
                     });
@@ -94,7 +105,7 @@ class _ProfilesState extends State<Profiles> {
                     return SearchProfile(
                       civID: data[index].id,
                       civName: data[index].fullName,
-                      notifyParent: refreshProfileReports,
+                      notifyParent: refresh,
                     );
                   },
                 ),
@@ -102,7 +113,7 @@ class _ProfilesState extends State<Profiles> {
             ),
           ),
           Expanded(
-            // Report Box
+            // Notepad Box
             child: Container(
               width: 150,
               color: colorBox,
@@ -121,56 +132,59 @@ class _ProfilesState extends State<Profiles> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          _reportWidgetList = [];
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
+                          
                         });
                       },
                       icon: const Icon(Icons.create_new_folder),
                       color: textColor,
-                      splashColor: transColor,
-                      highlightColor: transColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
                     ),
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          MyDatabase.delUserFromId(int.parse(
-                              stateIdTextFieldController.text == ''
+                          db.deleteUserFromId(int.parse(
+                              _stateIdTextFieldController.text == ''
                                   ? '-1'
-                                  : stateIdTextFieldController.text));
+                                  : _stateIdTextFieldController.text));
                           _foundUsers = MyDatabase.listUsers;
-
-                          _reportWidgetList = [];
+                          
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
                       icon: const Icon(Icons.delete),
                       color: textColor,
-                      splashColor: transColor,
-                      highlightColor: transColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
                     ),
                     IconButton(
                       onPressed: () {
-                        if (stateIdTextFieldController.text == '') return;
+                        if (_stateIdTextFieldController.text == '') return;
                         setState(() {
-                          MyDatabase.addOrUpdateUser(Civ(
+                          db.createOrUpdateUser(Civ(
                               id: int.parse(
-                                  stateIdTextFieldController.text == ''
+                                  _stateIdTextFieldController.text == ''
                                       ? '-1'
-                                      : stateIdTextFieldController.text),
-                              fullName: fullNameTextFieldController.text,
+                                      : _stateIdTextFieldController.text),
+                              fullName: _fullNameTextFieldController.text,
                               isWarant: false,
-                              imageProfileURL: imageURLTextFieldController.text,
-                              detailsProfile: detailsTextFieldController.text));
-
+                              imageProfileURL:
+                                  _imageURLTextFieldController.text,
+                              detailsProfile:
+                                  _detailsTextFieldController.text));
                           _foundUsers = MyDatabase.listUsers;
-                          _reportWidgetList = [];
+                          
+                          _crimWidgetList = [];
                           ProfilesTexts.clearAll();
                         });
                       },
                       icon: const Icon(Icons.save),
                       color: textColor,
-                      splashColor: transColor,
-                      highlightColor: transColor,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
                     )
                   ],
                 ),
@@ -195,8 +209,9 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
+                                    style: const TextStyle(color: textColor),
                                     keyboardType: TextInputType.number,
-                                    controller: stateIdTextFieldController
+                                    controller: _stateIdTextFieldController
                                       ..text = ProfilesTexts.textProfileID,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -209,7 +224,8 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: fullNameTextFieldController
+                                    style: const TextStyle(color: textColor),
+                                    controller: _fullNameTextFieldController
                                       ..text = ProfilesTexts.textProfileName,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -222,7 +238,8 @@ class _ProfilesState extends State<Profiles> {
                               SizedBox(
                                   width: 200,
                                   child: TextField(
-                                    controller: imageURLTextFieldController
+                                    style: const TextStyle(color: textColor),
+                                    controller: _imageURLTextFieldController
                                       ..text = ProfilesTexts.textProfileURL,
                                     decoration: const InputDecoration(
                                         labelStyle: TextStyle(color: textColor),
@@ -239,7 +256,7 @@ class _ProfilesState extends State<Profiles> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
-                      controller: detailsTextFieldController
+                      controller: _detailsTextFieldController
                         ..text = ProfilesTexts.detailsProfile,
                       decoration: const InputDecoration(
                           filled: true,
@@ -274,12 +291,13 @@ class _ProfilesState extends State<Profiles> {
                   ],
                 ),
                 ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: _reportWidgetList.length,
-                  itemBuilder: (context, index) {
-                    return _reportWidgetList[index];
-                  },
-                ),
+                shrinkWrap: true,
+                itemCount: _crimWidgetList.length,
+                itemBuilder: (context, index) {
+                  return _crimWidgetList[
+                      index];
+                },
+              ),
               ]),
             ),
           )

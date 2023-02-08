@@ -36,7 +36,7 @@ class _SearchReportState extends State<SearchReport> {
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: () {
-          Report report = MyDatabase.getReportFromId(widget.id);
+          Report report = MyDatabase.getReportFromID(widget.id);
           ReportsTexts.titleReportName =
               'Edit Incident (#${report.id.toString()})';
           ReportsTexts.textReportTitle = report.reportName;
@@ -75,23 +75,22 @@ class _SearchReportState extends State<SearchReport> {
 class ReportProfile extends StatefulWidget {
   final String stateID;
   final Function(bool, List) notifyParent;
-  bool isWarrant;
   
-  ReportProfile({super.key, required this.notifyParent, required this.stateID, required this.isWarrant});
+  const ReportProfile({super.key, required this.notifyParent, required this.stateID});
 
   @override
   State<ReportProfile> createState() => _ReportProfileState();
 }
 
 class _ReportProfileState extends State<ReportProfile> {
+  bool? isWarrant = false;
 
-  TextEditingController stateIDTextFieldController =
+  TextEditingController _stateIDTextFieldController =
       TextEditingController();
 
     @override
     void initState(){
-      stateIDTextFieldController.text = widget.stateID;
-      super.initState();
+      _stateIDTextFieldController.text = widget.stateID;
     }
 
   @override
@@ -112,7 +111,8 @@ class _ReportProfileState extends State<ReportProfile> {
                     child: SizedBox(
                         width: 200,
                         child: TextField(
-                          controller: stateIDTextFieldController,
+                          style: const TextStyle(color: textColor),
+                          controller: _stateIDTextFieldController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                               labelStyle: TextStyle(color: textColor),
@@ -122,32 +122,32 @@ class _ReportProfileState extends State<ReportProfile> {
                   const Expanded(child: SizedBox()),
                   IconButton(
                     onPressed: () {
-                      widget.notifyParent(true,[stateIDTextFieldController.text]);
+                      widget.notifyParent(true,[_stateIDTextFieldController.text]);
                     },
                     icon: const Icon(Icons.delete),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   ),
                   IconButton(
                     onPressed: () {
-                      widget.notifyParent(false, [stateIDTextFieldController.text, widget.isWarrant]);
+                      widget.notifyParent(false, [_stateIDTextFieldController.text, isWarrant]);
                     },
                     icon: const Icon(Icons.save),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   )
                 ],
               ),
               Row(
                 children: [
                   Checkbox(
-                    value: widget.isWarrant,
+                    value: isWarrant,
                     onChanged: (value) {
 
                       setState(() {
-                        widget.isWarrant = value!;
+                        isWarrant = value;
                       });
                     },
                   ),

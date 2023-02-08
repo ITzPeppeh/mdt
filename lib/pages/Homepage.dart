@@ -3,6 +3,7 @@ import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/database.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/warrantbox.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,9 +13,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
+
   @override
   void initState() {
-    MyDatabase.initDatabase();
+    if (_myDB.get(tableUsersName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
     super.initState();
   }
 
@@ -41,14 +49,15 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {
-                    setState(() {});
-                  },
-                  icon: const Icon(Icons.refresh),
-                  color: textColor,
-                  splashColor: transColor,
-                  highlightColor: transColor,
-                ),
+                    onPressed: () {
+                      setState(() {
+                      });
+                    },
+                    icon: const Icon(Icons.refresh),
+                    color: textColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
+                  ),
               ],
             ),
             ListView.builder(

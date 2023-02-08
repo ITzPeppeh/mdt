@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/database.dart';
@@ -35,6 +36,7 @@ class _ChargesState extends State<Charges> {
                 child: Column(
                   children: [
                     TextField(
+                      style: const TextStyle(color: textColor),
                       decoration: const InputDecoration(
                           labelStyle: TextStyle(color: textColor),
                           labelText: 'Search',

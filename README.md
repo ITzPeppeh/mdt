@@ -12,4 +12,3 @@ Run this commands in project folder:
 #Fix Scroll ListView Charges
 #User provider replacing listview
 ####Little bug scroll between reports, see same crim
-#update db

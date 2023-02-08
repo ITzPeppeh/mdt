@@ -3,6 +3,7 @@ import 'package:mdt/models/constants.dart';
 import 'package:mdt/models/report.dart';
 import 'package:mdt/models/sidebar.dart';
 import 'package:mdt/models/database.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class Reports extends StatefulWidget {
   const Reports({super.key});
@@ -12,52 +13,55 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  final _myDB = Hive.box(dbName);
+  MyDatabase db = MyDatabase();
   List _foundReports = [];
   List _crimWidgetList = [];
-  TextEditingController titleReportTextFieldController =
-      TextEditingController();
-  TextEditingController detailsReportTextFieldController =
-      TextEditingController();
 
-  refreshProfileReps() {
+  refresh() {
     setState(() {
       _crimWidgetList = [];
       if (ReportsTexts.textReportID == '') return;
 
       int id = int.parse(ReportsTexts.textReportID);
-
-      for (var crim in MyDatabase.listCrimReports) {
-        if (crim.idReport == id) {
+      for (var i = 0; i < MyDatabase.listCrimReports.length; i++) {
+        if (MyDatabase.listCrimReports[i].idReport == id) {
           _crimWidgetList.add(ReportProfile(
-            notifyParent: addCrimToReport,
-            stateID: crim.idCiv.toString(),
-            isWarrant: crim.isWarrant,
-          ));
+              notifyParent: addToReport,
+              stateID: MyDatabase.listCrimReports[i].idCiv.toString()));
         }
       }
     });
   }
 
-  addCrimToReport(bool deleteReport, List civAndWarrant) {
-    /* 2in1 */
-    if (ReportsTexts.textReportID == '') return;
+  addToReport(bool deleteReport, List lol) {
     if (!deleteReport) {
-      if (civAndWarrant[0] == '') return;
-
-      MyDatabase.addCrimReport(Arrested(
+      if (ReportsTexts.textReportID == '') return;
+      if (lol[0] == '') return;
+      print(lol[1]);
+      MyDatabase.listCrimReports.add(Arrested(
           idReport: int.parse(ReportsTexts.textReportID),
-          idCiv: int.parse(civAndWarrant[0]),
-          isWarrant: civAndWarrant[1]));
-
-      MyDatabase.updateWarrant(int.parse(civAndWarrant[0]), civAndWarrant[1]);
-
+          idCiv: int.parse(lol[0]),
+          isWarrant: lol[1]));
+      
+      MyDatabase.listUsers.forEach((element) {
+        print('---');
+        print(element.id);
+        print(lol[1]);
+        print('--');
+         if(element.id == int.parse(lol[0]) && element.isWarant != lol[1]) {
+          print('dentro');
+        element.isWarant = lol[1];}});
       setState(() {
         ReportsTexts.clearAll();
         /*TODO: DELETE ONLY HIS WIDGET(?)*/
         _crimWidgetList.clear();
       });
     } else {
-      MyDatabase.delCrimReport(ReportsTexts.textReportID);
+      if (ReportsTexts.textReportID == '') return;
+
+      MyDatabase.listCrimReports.removeWhere((element) =>
+          element.idReport.toString() == ReportsTexts.textReportID);
 
       setState(() {
         ReportsTexts.clearAll();
@@ -66,9 +70,18 @@ class _ReportsState extends State<Reports> {
     }
   }
 
+  TextEditingController _titleReportTextFieldController =
+      TextEditingController();
+  TextEditingController _detailsReportTextFieldController =
+      TextEditingController();
+
   @override
   void initState() {
-    MyDatabase.initDatabase();
+    if (_myDB.get(tableReportsName) == null) {
+      db.createInitialData();
+    } else {
+      db.loadData();
+    }
     _foundReports = MyDatabase.listReports;
     super.initState();
   }
@@ -95,6 +108,7 @@ class _ReportsState extends State<Reports> {
                 ],
               ),
               TextField(
+                style: const TextStyle(color: textColor),
                 decoration: const InputDecoration(
                     labelStyle: TextStyle(color: textColor),
                     labelText: 'Search',
@@ -110,6 +124,7 @@ class _ReportsState extends State<Reports> {
                             .contains(textValue.toLowerCase()))
                         .toList();
                   }
+
                   setState(() {
                     _foundReports = results;
                   });
@@ -124,7 +139,7 @@ class _ReportsState extends State<Reports> {
                     title: data[index].reportName,
                     id: data[index].id,
                     dateCreate: data[index].dateCreated,
-                    notifyParent: refreshProfileReps,
+                    notifyParent: refresh,
                   );
                 },
               ),
@@ -155,13 +170,13 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.create_new_folder),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   ),
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        MyDatabase.deleteReportFromId(int.parse(
+                        db.deleteReportFromId(int.parse(
                             ReportsTexts.textReportID == ''
                                 ? '-1'
                                 : ReportsTexts.textReportID));
@@ -171,14 +186,14 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.delete),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   ),
                   IconButton(
                     onPressed: () {
                       if (ReportsTexts.textReportTitle == '') return;
                       setState(() {
-                        MyDatabase.addOrUpdateReport(Report(
+                        db.createOrUpdateReport(Report(
                             id: int.parse(ReportsTexts.textReportID == ''
                                 ? '-1'
                                 : ReportsTexts.textReportID),
@@ -191,8 +206,8 @@ class _ReportsState extends State<Reports> {
                     },
                     icon: const Icon(Icons.save),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   )
                 ],
               ),
@@ -200,7 +215,7 @@ class _ReportsState extends State<Reports> {
                 onChanged: (value) {
                   ReportsTexts.textReportTitle = value;
                 },
-                controller: titleReportTextFieldController
+                controller: _titleReportTextFieldController
                   ..text = ReportsTexts.textReportTitle,
                 style: const TextStyle(color: textColor),
                 decoration: const InputDecoration(
@@ -219,7 +234,7 @@ class _ReportsState extends State<Reports> {
                     onChanged: (value) {
                       ReportsTexts.textDetails = value;
                     },
-                    controller: detailsReportTextFieldController
+                    controller: _detailsReportTextFieldController
                       ..text = ReportsTexts.textDetails,
                     decoration: const InputDecoration(
                         filled: true, fillColor: sideBarColor),
@@ -252,16 +267,13 @@ class _ReportsState extends State<Reports> {
                     onPressed: () {
                       setState(() {
                         _crimWidgetList.add(ReportProfile(
-                          notifyParent: addCrimToReport,
-                          stateID: '',
-                          isWarrant: false,
-                        ));
+                            notifyParent: addToReport, stateID: ''));
                       });
                     },
                     icon: const Icon(Icons.add),
                     color: textColor,
-                    splashColor: transColor,
-                    highlightColor: transColor,
+                    splashColor: Colors.transparent,
+                    highlightColor: Colors.transparent,
                   )
                 ],
               ),
@@ -269,7 +281,8 @@ class _ReportsState extends State<Reports> {
                 shrinkWrap: true,
                 itemCount: _crimWidgetList.length,
                 itemBuilder: (context, index) {
-                  return _crimWidgetList[index];
+                  return _crimWidgetList[
+                      index];
                 },
               ),
             ]),
